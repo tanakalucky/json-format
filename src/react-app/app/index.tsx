@@ -1,25 +1,15 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/index.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HomePage } from "@/pages/home";
+import { JsonFormatterPage } from "@/pages/json-formatter";
 import { ErrorBoundary } from "@/app/providers/ErrorBoundary";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+import { Toaster } from "@/shared/ui/Sonner";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <HomePage />
-      </QueryClientProvider>
+      <JsonFormatterPage />
+      <Toaster />
     </ErrorBoundary>
   </StrictMode>,
 );
