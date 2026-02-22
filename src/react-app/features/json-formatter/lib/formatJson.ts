@@ -59,9 +59,29 @@ function createErrorResult(error: unknown, input: string): JsonFormatResult {
   };
 }
 
+function tryParseWithUnescape(input: string): unknown {
+  try {
+    const parsed = JSON.parse(input);
+    if (typeof parsed === "string") {
+      try {
+        return JSON.parse(parsed);
+      } catch {
+        return parsed;
+      }
+    }
+    return parsed;
+  } catch (firstError) {
+    if (input.includes('\\"')) {
+      const unescaped = input.replace(/\\"/g, '"');
+      return JSON.parse(unescaped);
+    }
+    throw firstError;
+  }
+}
+
 function validateJson(input: string): JsonFormatResult {
   try {
-    JSON.parse(input);
+    tryParseWithUnescape(input);
     return { success: true, output: input };
   } catch (error) {
     return createErrorResult(error, input);
@@ -70,7 +90,7 @@ function validateJson(input: string): JsonFormatResult {
 
 function prettifyJson(input: string, indent = 2): JsonFormatResult {
   try {
-    const parsed = JSON.parse(input);
+    const parsed = tryParseWithUnescape(input);
     return { success: true, output: JSON.stringify(parsed, null, indent) };
   } catch (error) {
     return createErrorResult(error, input);
@@ -79,7 +99,7 @@ function prettifyJson(input: string, indent = 2): JsonFormatResult {
 
 function minifyJson(input: string): JsonFormatResult {
   try {
-    const parsed = JSON.parse(input);
+    const parsed = tryParseWithUnescape(input);
     return { success: true, output: JSON.stringify(parsed) };
   } catch (error) {
     return createErrorResult(error, input);
